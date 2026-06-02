@@ -36,23 +36,27 @@ LilyPad-unsigned.ipa
 
 这个 IPA 是未签名包，主要用于检查构建结果，通常不能直接安装到 iPad。
 
-## 生成可安装 IPA
+## 下一版本计划
 
-要生成可安装 IPA，需要 Apple 开发者签名资料，并在 GitHub Secrets 添加：
+下一版本目标：
 
 ```text
-BUILD_CERTIFICATE_BASE64
-P12_PASSWORD
-BUILD_PROVISION_PROFILE_BASE64
-KEYCHAIN_PASSWORD
-TEAM_ID
-BUNDLE_ID
+v0.2 Offline Compile + UI Refresh
 ```
 
-然后手动运行：
+重点：
+
+- iPad 端离线编译 `.ly`
+- 美化 iPad 三栏 UI
+- 文件管理
+- PDF 预览
+- 编译日志
+- 保留 unsigned IPA 云端构建
+
+详细计划见：
 
 ```text
-.github/workflows/build-signed-ipa.yml
+docs/NEXT_VERSION_PLAN.md
 ```
 
 ## 默认信息
