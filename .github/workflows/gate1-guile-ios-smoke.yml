@@ -29,7 +29,7 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
-          brew install pkg-config autoconf automake libtool
+          brew install pkg-config autoconf automake libtool guile
 
       - name: Prepare script
         run: chmod +x native-engine-lab/scripts/build-guile-ios.sh
