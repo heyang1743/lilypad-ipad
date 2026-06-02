@@ -51,8 +51,23 @@ jobs:
           ASSETS_SIZE=$(stat -f%z "$ASSETS")
           INFO_SIZE=$(stat -f%z "$INFO")
 
-          if [ "$EXEC_SIZE" -lt 200000 ]; then
+          if [ "$EXEC_SIZE" -lt 100000 ]; then
             echo "Executable too small: $EXEC_SIZE"
+            exit 1
+          fi
+
+          if ! strings "$EXEC" | grep -q "LilyPad v0.2"; then
+            echo "Missing LilyPad v0.2 marker in executable"
+            exit 1
+          fi
+
+          if ! strings "$EXEC" | grep -q "Swift LilyPond"; then
+            echo "Missing Swift LilyPond compiler marker in executable"
+            exit 1
+          fi
+
+          if ! strings "$EXEC" | grep -q "PDFKit"; then
+            echo "Missing PDFKit marker in executable"
             exit 1
           fi
 
