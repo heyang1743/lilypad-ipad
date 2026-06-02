@@ -34,6 +34,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# Normalize --output to an absolute path because later build stages cd into source directories.
+case "$OUT_DIR" in
+  /*) ;;
+  *) OUT_DIR="$PWD/$OUT_DIR" ;;
+esac
+
 SRC_DIR="$OUT_DIR/source-cache"
 BUILD_DIR="$OUT_DIR/build"
 PREFIX_DIR="$OUT_DIR/prefix"
