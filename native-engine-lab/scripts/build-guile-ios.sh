@@ -158,7 +158,7 @@ prepare_sources() {
 
 build_bdwgc() {
   cd "$BUILD_DIR/gc-${BDWGC_VERSION}"
-  run_logged bdwgc-configure env CFLAGS="$CFLAGS_BASE" LDFLAGS="$LDFLAGS_BASE" ./configure --host="$HOST_TRIPLE" --prefix="$PREFIX_DIR" --disable-shared --enable-static --enable-threads=posix
+  run_logged bdwgc-configure env CFLAGS="$CFLAGS_BASE" LDFLAGS="$LDFLAGS_BASE" ./configure --host="$HOST_TRIPLE" --prefix="$PREFIX_DIR" --disable-shared --enable-static --enable-threads=posix --with-libatomic-ops=none
   run_logged bdwgc-make make -j"$(sysctl -n hw.ncpu)"
   run_logged bdwgc-install make install
 }
