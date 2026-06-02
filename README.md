@@ -16,19 +16,19 @@ LilyPad 是一个面向 iPad 的 LilyPond `.ly` 编辑器壳工程。
 
 ## GitHub Actions 构建
 
-当前 Token 缺少 GitHub 的 `workflow` scope，GitHub 不允许我直接写入 `.github/workflows/*`。因此我先把 Actions 文件放在：
+仓库 push 后会自动运行：
 
 ```text
-workflow-templates/
+.github/workflows/build-unsigned.yml
 ```
 
-等 Token 增加 `workflow` 权限后，把模板复制到下面目录即可启用自动构建：
+产物位置：
 
 ```text
-.github/workflows/
+GitHub → Actions → Build unsigned iPad IPA → Artifacts
 ```
 
-启用后，未签名构建会生成：
+会生成：
 
 ```text
 LilyPad-unsigned.ipa
