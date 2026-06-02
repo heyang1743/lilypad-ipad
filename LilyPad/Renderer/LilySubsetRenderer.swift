@@ -1,33 +1,33 @@
 import Foundation
 import UIKit
 
-struct LilySubsetCompiler {
-    static func compile(_ source: String) -> LilyCompileResult {
+struct LilySubsetRenderer {
+    static func renderPreview(_ source: String) -> LilyRenderResult {
         let title = extractHeaderValue("title", from: source) ?? "LilyPad Offline Preview"
         let music = extractMusicBlock(from: source)
         let notes = parseNotes(from: music)
 
         var log: [String] = []
-        log.append("LilyPad v0.2 离线编译 MVP")
-        log.append("模式：Swift LilyPond 子集编译器")
+        log.append("LilyPad v0.2 子集离线预览 MVP")
+        log.append("模式：Swift LilyPond 子集渲染器，不包含 GNU LilyPond")
         log.append("说明：当前不是完整 LilyPond，只支持基础旋律子集。")
         log.append("")
         log.append("标题：\(title)")
         log.append("识别音符：\(notes.count) 个")
 
         guard !notes.isEmpty else {
-            log.append("❌ 没有识别到可编译的音符。")
+            log.append("❌ 没有识别到可预览的音符。")
             log.append("请确认源码中包含类似 c4 d e f | g2 g 的旋律。")
-            return LilyCompileResult(success: false, notes: [], pdfData: nil, log: log.joined(separator: "\n"))
+            return LilyRenderResult(success: false, notes: [], pdfData: nil, log: log.joined(separator: "\n"))
         }
 
         let pdf = LilyPDFRenderer.render(title: title, notes: notes, source: source)
         log.append("✅ 已生成离线 PDF 预览。")
         log.append("输出：内存 PDF 数据，已交给 PDFKit 预览。")
         log.append("")
-        log.append("下一步：扩展 parser，支持更多 LilyPond 语法、和弦、歌词、MIDI。")
+        log.append("下一步：接入真正 GNU LilyPond/WASM 引擎；当前 Swift 子集渲染器只做预览。")
 
-        return LilyCompileResult(success: true, notes: notes, pdfData: pdf, log: log.joined(separator: "\n"))
+        return LilyRenderResult(success: true, notes: notes, pdfData: pdf, log: log.joined(separator: "\n"))
     }
 
     private static func extractHeaderValue(_ key: String, from source: String) -> String? {
@@ -187,7 +187,7 @@ enum LilyPDFRenderer {
         ]
 
         NSString(string: title).draw(in: CGRect(x: 48, y: 36, width: page.width - 96, height: 36), withAttributes: titleAttributes)
-        NSString(string: "Generated offline by LilyPad Swift subset compiler").draw(in: CGRect(x: 48, y: 74, width: page.width - 96, height: 22), withAttributes: subtitleAttributes)
+        NSString(string: "Generated offline by LilyPad Swift subset renderer (not GNU LilyPond)").draw(in: CGRect(x: 48, y: 74, width: page.width - 96, height: 22), withAttributes: subtitleAttributes)
     }
 
     private static func drawStaff(notes: [LilyNote], page: CGRect, context cg: CGContext) {

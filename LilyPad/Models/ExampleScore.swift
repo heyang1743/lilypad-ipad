@@ -10,7 +10,7 @@ struct ExampleScore: Identifiable, Hashable {
         ExampleScore(
             id: "simple-scale",
             title: "C 大调练习",
-            subtitle: "v0.2 离线编译 MVP 示例",
+            subtitle: "v0.2 子集离线预览示例",
             source: """
             \\version "2.24.0"
             \\language "english"

@@ -12,7 +12,7 @@ struct LilyNote: Identifiable, Hashable {
     }
 }
 
-struct LilyCompileResult {
+struct LilyRenderResult {
     let success: Bool
     let notes: [LilyNote]
     let pdfData: Data?

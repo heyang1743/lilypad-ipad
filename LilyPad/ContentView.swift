@@ -2,16 +2,16 @@ import SwiftUI
 import Foundation
 import UIKit
 
-private enum CompileStatus {
+private enum PreviewStatus {
     case idle
     case success
     case failed
 
     var title: String {
         switch self {
-        case .idle: return "等待编译"
-        case .success: return "离线编译成功"
-        case .failed: return "编译失败"
+        case .idle: return "等待预览"
+        case .success: return "子集预览成功"
+        case .failed: return "预览失败"
         }
     }
 
@@ -36,9 +36,9 @@ struct ContentView: View {
     @State private var selectedExampleID: String? = ExampleScore.all.first?.id
     @State private var documentName = "C 大调练习.ly"
     @State private var lilyCode = ExampleScore.all.first?.source ?? ""
-    @State private var logText = "LilyPad v0.2 已就绪。点击“离线编译”会使用 Swift LilyPond 子集编译器生成 PDF 预览。"
+    @State private var logText = "LilyPad v0.2 已就绪。当前 IPA 不包含完整 GNU LilyPond；点击“子集预览”会使用 Swift 子集渲染器生成 PDF 预览。"
     @State private var pdfData: Data?
-    @State private var compileStatus: CompileStatus = .idle
+    @State private var previewStatus: PreviewStatus = .idle
     @State private var noteCount = 0
 
     var body: some View {
@@ -57,9 +57,9 @@ struct ContentView: View {
                         }
 
                         Button {
-                            compileOffline()
+                            renderSubsetPreview()
                         } label: {
-                            Label("离线编译", systemImage: "play.fill")
+                            Label("子集预览", systemImage: "play.fill")
                         }
                     }
                 }
@@ -103,7 +103,7 @@ struct ContentView: View {
                 }
             }
 
-            Section("离线编译状态") {
+            Section("子集预览状态") {
                 statusCard
             }
         }
@@ -111,15 +111,15 @@ struct ContentView: View {
 
     private var statusCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label(compileStatus.title, systemImage: compileStatus.symbol)
-                .foregroundStyle(compileStatus.color)
+            Label(previewStatus.title, systemImage: previewStatus.symbol)
+                .foregroundStyle(previewStatus.color)
                 .font(.headline)
 
             Text("识别音符：\(noteCount)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Text("当前引擎：Swift LilyPond 子集 MVP")
+            Text("当前引擎：Swift 子集渲染器；不含 GNU LilyPond")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -178,7 +178,7 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(documentName)
                     .font(.title3.bold())
-                Text("iPad 离线编译 MVP · 美化三栏 UI")
+                Text("iPad 子集离线预览 · 美化三栏 UI")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -186,9 +186,9 @@ struct ContentView: View {
             Spacer()
 
             Button {
-                compileOffline()
+                renderSubsetPreview()
             } label: {
-                Label("离线编译", systemImage: "play.fill")
+                Label("子集预览", systemImage: "play.fill")
             }
             .buttonStyle(.borderedProminent)
         }
@@ -233,12 +233,12 @@ struct ContentView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Label("编译日志", systemImage: "terminal")
+                    Label("预览日志", systemImage: "terminal")
                         .font(.headline)
                     Spacer()
-                    Text(compileStatus.title)
+                    Text(previewStatus.title)
                         .font(.caption)
-                        .foregroundStyle(compileStatus.color)
+                        .foregroundStyle(previewStatus.color)
                 }
 
                 ScrollView {
@@ -264,16 +264,16 @@ struct ContentView: View {
             Text("还没有 PDF 预览")
                 .font(.title3.bold())
 
-            Text("点击“离线编译”，LilyPad 会在 iPad 端用 Swift 子集编译器生成 PDF 乐谱预览。")
+            Text("点击“子集预览”，LilyPad 会用 Swift 子集渲染器生成 PDF 乐谱预览；这不是完整 GNU LilyPond。")
                 .multilineTextAlignment(.center)
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: 360)
 
             Button {
-                compileOffline()
+                renderSubsetPreview()
             } label: {
-                Label("立即离线编译", systemImage: "play.fill")
+                Label("立即生成子集预览", systemImage: "play.fill")
             }
             .buttonStyle(.borderedProminent)
         }
@@ -282,12 +282,12 @@ struct ContentView: View {
         .clipShape(RoundedRectangle(cornerRadius: 18))
     }
 
-    private func compileOffline() {
-        let result = LilySubsetCompiler.compile(lilyCode)
+    private func renderSubsetPreview() {
+        let result = LilySubsetRenderer.renderPreview(lilyCode)
         pdfData = result.pdfData
         logText = result.log
         noteCount = result.notes.count
-        compileStatus = result.success ? .success : .failed
+        previewStatus = result.success ? .success : .failed
     }
 
     private func loadExample(id: String?) {
@@ -296,8 +296,8 @@ struct ContentView: View {
         lilyCode = example.source
         pdfData = nil
         noteCount = 0
-        compileStatus = .idle
-        logText = "已加载示例：\(example.title)。点击“离线编译”生成 PDF 预览。"
+        previewStatus = .idle
+        logText = "已加载示例：\(example.title)。点击“子集预览”生成 PDF 预览。"
     }
 
     private func newScore() {
@@ -323,7 +323,7 @@ struct ContentView: View {
         """
         pdfData = nil
         noteCount = 0
-        compileStatus = .idle
+        previewStatus = .idle
         logText = "已新建谱子。"
     }
 

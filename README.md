@@ -8,12 +8,12 @@ LilyPad 是一个面向 iPad 的 LilyPond `.ly` 编辑器壳工程。
 - LilyPond 源码编辑区
 - 示例 `.ly` 谱库
 - 快捷插入按钮
-- Swift LilyPond 子集离线编译 MVP
+- Swift LilyPond 子集离线预览/渲染原型（不包含 GNU LilyPond）
 - PDFKit 乐谱预览
 - 编译日志面板
 - GitHub Actions 云端 unsigned IPA 构建
 
-> 注意：当前离线编译器是 LilyPond 子集 MVP，不是完整 GNU LilyPond。它先支持基础旋律、时值、小节线和 PDF 预览；完整 LilyPond/WASM 引擎作为后续研究方向。
+> 重要说明：当前 IPA **不包含完整 GNU LilyPond 编译器**，也不包含 Guile/Ghostscript/Fontconfig 等 LilyPond 依赖。当前功能只是 Swift 写的 LilyPond 子集解析 + PDF 渲染原型，用于验证 iPad 离线工作流。真正完整 LilyPond 离线引擎需要单独移植或 WASM 化，见 `docs/REAL_LILYPOND_ENGINE.md`。
 
 ## GitHub Actions 构建
 
@@ -57,7 +57,7 @@ v0.2 Offline Compile + UI Refresh
 
 重点：
 
-- iPad 端离线编译 `.ly`
+- iPad 端完整 LilyPond 离线引擎研究
 - 美化 iPad 三栏 UI
 - 文件管理
 - PDF 预览
@@ -83,6 +83,6 @@ Deployment Target: iPadOS 17.0+
 
 1. 完善 `.ly` 文件管理。
 2. 添加语法高亮和行号。
-3. 扩展 Swift LilyPond 子集编译器。
+3. 扩展 Swift LilyPond 子集渲染器。
 4. 改进 PDF 生成质量和 PDFKit 预览。
-5. 研究完整 LilyPond/WASM 离线引擎。
+5. 研究并接入完整 GNU LilyPond/WASM 离线引擎。

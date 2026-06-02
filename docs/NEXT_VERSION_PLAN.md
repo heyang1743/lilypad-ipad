@@ -1,10 +1,10 @@
 # LilyPad v0.2 下一版本计划
 
-目标版本：`v0.2 Offline Compile + UI Refresh`
+目标版本：`v0.2 Subset Preview + UI Refresh`
 
 核心目标：
 
-1. iPad 端离线编译 `.ly`
+1. iPad 端 LilyPond 子集离线预览/渲染，不包含完整 GNU LilyPond
 2. 美化 UI，做成真正可用的 iPad 编辑器
 3. 保留 GitHub Actions 云端构建能力
 
@@ -17,7 +17,7 @@
 - iPad 横竖屏自适应编辑界面
 - `.ly` 文件创建、打开、保存
 - LilyPond 源码编辑器基础优化
-- 本地离线编译技术原型
+- 本地子集离线预览/渲染技术原型
 - 编译日志面板
 - PDF 预览面板
 - 示例谱库
@@ -29,13 +29,13 @@
 - App Store 上架
 - 完整 Guile/LilyPond 原生移植完成
 
-原因：iOS 不能像 Linux/macOS 一样直接运行 `lilypond` 命令行程序。真正离线编译需要把排版核心移植进 App。
+原因：iOS 不能像 Linux/macOS 一样直接运行 `lilypond` 命令行程序。真正子集离线预览/渲染需要把排版核心移植进 App。
 
 ---
 
-## 2. iPad 离线编译技术路线
+## 2. iPad 子集离线预览/渲染技术路线
 
-### 路线 A：WASM 离线编译核心，优先研究
+### 路线 A：WASM 子集离线预览/渲染核心，优先研究
 
 目标：把 LilyPond 或兼容排版核心编译成 WebAssembly，然后在 iPad App 内通过 `WKWebView` 或 JavaScriptCore 离线运行。
 
@@ -69,7 +69,7 @@ PDFKit / QuickLook 预览
 v0.2 目标：
 
 - 做 WASM 可行性验证
-- 至少实现一个离线编译 demo
+- 至少实现一个子集离线预览/渲染 demo
 - 如果完整 LilyPond 不现实，先支持 LilyPond 子集
 
 ---
@@ -105,9 +105,9 @@ v0.2 只做调研，不作为主线实现。
 
 ---
 
-### 路线 C：Swift 内置轻量编译器，作为 MVP 备选
+### 路线 C：Swift 内置轻量子集渲染器，作为 MVP 备选
 
-如果完整 LilyPond 离线编译太难，先做一个 LilyPond 子集解释器：
+如果完整 LilyPond 子集离线预览/渲染太难，先做一个 LilyPond 子集解释器/渲染器：
 
 支持：
 
@@ -139,7 +139,7 @@ v0.2 只做调研，不作为主线实现。
 v0.2 推荐策略：
 
 ```text
-先做 Swift LilyPond 子集编译器 MVP
+先做 Swift LilyPond 子集渲染器 MVP（明确不是 GNU LilyPond）
 同时并行研究 WASM 完整引擎
 ```
 
@@ -282,7 +282,7 @@ v0.2 推荐策略：
 - 打开文件
 - 最近项目
 - 示例模板
-- 离线编译状态
+- 子集离线预览/渲染状态
 - LilyPond 引擎版本/模式
 
 ---
@@ -304,9 +304,9 @@ v0.2 推荐策略：
 - 最近文件
 - Share Sheet
 
-### 第 3 周：离线编译 MVP
+### 第 3 周：子集离线预览/渲染 MVP
 
-- Swift LilyPond 子集 parser
+- Swift LilyPond 子集渲染器
 - PDF 生成
 - 编译日志
 - 错误提示

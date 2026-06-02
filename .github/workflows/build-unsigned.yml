@@ -61,8 +61,8 @@ jobs:
             exit 1
           fi
 
-          if ! strings "$EXEC" | grep -q "Swift LilyPond"; then
-            echo "Missing Swift LilyPond compiler marker in executable"
+          if ! strings "$EXEC" | grep -q "not GNU LilyPond"; then
+            echo "Missing subset renderer marker in executable"
             exit 1
           fi
 
