@@ -1,0 +1,83 @@
+name: Gate 1 Guile iOS Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ engine-research ]
+    paths:
+      - 'native-engine-lab/**'
+      - '.github/workflows/gate1-guile-ios-smoke.yml'
+
+jobs:
+  guile-ios-smoke:
+    runs-on: macos-15
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphonesimulator --show-sdk-path
+          xcrun --sdk iphonesimulator --find clang
+          uname -a
+
+      - name: Install build tools
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: |
+          brew install pkg-config autoconf automake libtool
+
+      - name: Prepare script
+        run: chmod +x native-engine-lab/scripts/build-guile-ios.sh
+
+      - name: Run Lane A pthreads mini-gmp
+        id: lane_a
+        continue-on-error: true
+        run: |
+          native-engine-lab/scripts/build-guile-ios.sh \
+            --sdk iphonesimulator \
+            --arch arm64 \
+            --threads pthreads \
+            --gmp mini \
+            --stage all \
+            --output native-engine-lab/out/lane-a
+
+      - name: Run Lane B null-threads mini-gmp fallback
+        id: lane_b
+        if: steps.lane_a.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          native-engine-lab/scripts/build-guile-ios.sh \
+            --sdk iphonesimulator \
+            --arch arm64 \
+            --threads null \
+            --gmp mini \
+            --stage all \
+            --output native-engine-lab/out/lane-b
+
+      - name: Summarize Gate 1 result
+        if: always()
+        run: |
+          echo "Lane A outcome: ${{ steps.lane_a.outcome }}"
+          echo "Lane B outcome: ${{ steps.lane_b.outcome }}"
+          if [ "${{ steps.lane_a.outcome }}" = "success" ]; then
+            echo "Gate 1 PASS: Lane A succeeded"
+            exit 0
+          fi
+          if [ "${{ steps.lane_b.outcome }}" = "success" ]; then
+            echo "Gate 1 CONDITIONAL PASS: Lane B succeeded after Lane A failed"
+            exit 0
+          fi
+          echo "Gate 1 FAIL: both Lane A and fallback failed"
+          exit 1
+
+      - name: Upload Gate 1 artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-guile-ios-smoke
+          path: native-engine-lab/out/**

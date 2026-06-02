@@ -8,3 +8,4 @@ DerivedData/
 *.xcarchive
 .swiftpm/
 .env
+native-engine-lab/out/
