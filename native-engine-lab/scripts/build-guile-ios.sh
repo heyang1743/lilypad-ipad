@@ -165,7 +165,7 @@ build_bdwgc() {
 
 build_libffi() {
   cd "$BUILD_DIR/libffi-${LIBFFI_VERSION}"
-  run_logged libffi-configure env CFLAGS="$CFLAGS_BASE" LDFLAGS="$LDFLAGS_BASE" ./configure --host="$HOST_TRIPLE" --prefix="$PREFIX_DIR" --disable-shared --enable-static --disable-builddir
+  run_logged libffi-configure env gcc_cv_as_cfi_pseudo_op=no CFLAGS="$CFLAGS_BASE" LDFLAGS="$LDFLAGS_BASE" ./configure --host="$HOST_TRIPLE" --prefix="$PREFIX_DIR" --disable-shared --enable-static --disable-builddir --disable-exec-static-tramp
   run_logged libffi-make make -j"$(sysctl -n hw.ncpu)"
   run_logged libffi-install make install
 }
