@@ -22,29 +22,83 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      - name: Build unsigned device app
+      - name: Archive unsigned device app
         run: |
-          xcodebuild \
+          rm -rf build Payload LilyPad-unsigned.ipa LilyPad-build-report.txt LilyPad-ipa-listing.txt
+          xcodebuild archive \
             -project LilyPad.xcodeproj \
             -scheme LilyPad \
             -configuration Release \
-            -sdk iphoneos \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
+            -archivePath build/LilyPad.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build
+            CODE_SIGN_IDENTITY=""
+
+      - name: Validate app bundle
+        run: |
+          APP="build/LilyPad.xcarchive/Products/Applications/LilyPad.app"
+          EXEC="$APP/LilyPad"
+          INFO="$APP/Info.plist"
+          ASSETS="$APP/Assets.car"
+
+          test -d "$APP"
+          test -f "$EXEC"
+          test -f "$INFO"
+          test -f "$ASSETS"
+
+          EXEC_SIZE=$(stat -f%z "$EXEC")
+          ASSETS_SIZE=$(stat -f%z "$ASSETS")
+          INFO_SIZE=$(stat -f%z "$INFO")
+
+          if [ "$EXEC_SIZE" -lt 200000 ]; then
+            echo "Executable too small: $EXEC_SIZE"
+            exit 1
+          fi
+
+          if [ "$ASSETS_SIZE" -lt 1000 ]; then
+            echo "Assets.car too small or missing: $ASSETS_SIZE"
+            exit 1
+          fi
+
+          {
+            echo "LilyPad unsigned build report"
+            echo "================================"
+            echo "Commit: $GITHUB_SHA"
+            echo "App path: $APP"
+            echo "Executable size: $EXEC_SIZE bytes"
+            echo "Assets.car size: $ASSETS_SIZE bytes"
+            echo "Info.plist size: $INFO_SIZE bytes"
+            echo ""
+            echo "Info.plist summary:"
+            /usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$INFO"
+            /usr/libexec/PlistBuddy -c 'Print CFBundleExecutable' "$INFO"
+            /usr/libexec/PlistBuddy -c 'Print UIDeviceFamily' "$INFO"
+            echo ""
+            echo "App bundle files:"
+            find "$APP" -maxdepth 3 -type f -print | sort | while read file; do
+              size=$(stat -f%z "$file")
+              echo "$size  ${file#$APP/}"
+            done
+          } > LilyPad-build-report.txt
+
+          cat LilyPad-build-report.txt
 
       - name: Package unsigned IPA
         run: |
+          APP="build/LilyPad.xcarchive/Products/Applications/LilyPad.app"
           rm -rf Payload LilyPad-unsigned.ipa
           mkdir -p Payload
-          cp -R build/Build/Products/Release-iphoneos/LilyPad.app Payload/
+          cp -R "$APP" Payload/
           zip -qry LilyPad-unsigned.ipa Payload
+          unzip -l LilyPad-unsigned.ipa > LilyPad-ipa-listing.txt
+          cat LilyPad-ipa-listing.txt
 
       - name: Upload unsigned IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: LilyPad-unsigned-ipa
-          path: LilyPad-unsigned.ipa
+          path: |
+            LilyPad-unsigned.ipa
+            LilyPad-build-report.txt
+            LilyPad-ipa-listing.txt

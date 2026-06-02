@@ -33,7 +33,17 @@ GitHub → Actions → Build unsigned iPad IPA → Artifacts
 
 ```text
 LilyPad-unsigned.ipa
+LilyPad-build-report.txt
+LilyPad-ipa-listing.txt
 ```
+
+CI 会强制校验：
+
+- `.app` 是否存在
+- 主可执行文件是否存在且大小合理
+- `Info.plist` 是否存在
+- `Assets.car` 是否存在
+- IPA 内部文件列表
 
 这个 IPA 是未签名包，主要用于检查构建结果，通常不能直接安装到 iPad。
 
